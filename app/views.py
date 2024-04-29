@@ -4,6 +4,9 @@ from rest_framework.response import Response
 from .models import Vendor, PurchaseOrder
 from .serializers import VendorSerializer, PurchaseOrderSerializer, VendorPerformanceSerializer
 from rest_framework.permissions import IsAuthenticated
+from django.core.cache import cache
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 
 from .view_ext import calculate_average_response_time,calculate_fulfilment_rate,calculate_on_time_delivery_rate,calculate_quality_rating_average
 
@@ -21,6 +24,9 @@ class VendorListCreateAPIView(generics.ListCreateAPIView):
     queryset = Vendor.objects.all()
     serializer_class = VendorSerializer
     permission_classes = [IsAuthenticated]
+    @method_decorator(cache_page(60 * 50))
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request,*args,**kwargs)
 
 class VendorRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     """
@@ -86,14 +92,18 @@ class VendorPerformanceAPIView(generics.RetrieveAPIView):
     lookup_url_kwarg = 'vendor_id'
 
     def retrieve (self, request, *args, **kwargs):
-        vendor = self.get_object()
-        performance_data = {
-            'on_time_delivery_rate': calculate_on_time_delivery_rate(vendor),
-            'quality_rating_avg': calculate_quality_rating_average(vendor),
-            'average_response_time': calculate_average_response_time(vendor),
-            'fulfillment_rate': calculate_fulfilment_rate(vendor)
-        }
-        return Response(performance_data)
+        try:
+            vendor = self.get_object()
+            performance_data = {
+                'on_time_delivery_rate': calculate_on_time_delivery_rate(vendor),
+                'quality_rating_avg': calculate_quality_rating_average(vendor),
+                'average_response_time': calculate_average_response_time(vendor),
+                'fulfillment_rate': calculate_fulfilment_rate(vendor)
+            }
+            return Response(performance_data)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
     
 class AcknowledgePurchaseOrderAPIView(generics.UpdateAPIView):
@@ -111,6 +121,9 @@ class AcknowledgePurchaseOrderAPIView(generics.UpdateAPIView):
     permission_classes = [IsAuthenticated]
 
     def update(self, request, *args, **kwargs):
-        purchase_order = self.get_object()
-        purchase_order.acknowledge()
-        return Response(status=status.HTTP_200_OK)
+        try:
+            purchase_order = self.get_object()
+            purchase_order.acknowledge()
+            return Response(status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
