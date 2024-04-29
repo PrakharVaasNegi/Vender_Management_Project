@@ -14,10 +14,6 @@ def update_metrics(sender, instance, **kwargs):
     print('---------------------------WORKING------------------------')
     print('---------------------------WORKING------------------------')
     print('---------------------------WORKING------------------------')
-    print('---------------------------WORKING------------------------')
-    print('---------------------------WORKING------------------------')
-    print('---------------------------WORKING------------------------')
-    print('---------------------------WORKING------------------------')
     vendor = instance.vendor
     vendor.on_time_delivery_rate = calculate_on_time_delivery_rate(vendor)
     vendor.quality_rating_avg = calculate_quality_rating_average(vendor)
