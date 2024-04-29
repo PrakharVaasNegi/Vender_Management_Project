@@ -1,0 +1,54 @@
+# Vendor Management API
+
+This project provides an API for managing vendors and purchase orders.
+
+## Getting Started
+
+Follow these instructions to set up and run the project on your local machine.
+
+### Prerequisites
+
+Make sure you have the following software installed on your machine:
+
+- Python (>= 3.6)
+- Django
+- Django REST Framework
+
+### Installation
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/your-username/vendor-management-api.git
+
+
+2. Navigate to the project directory:
+
+cd vendor-management-api
+
+3. Install the required Python packages:
+
+pip install -r requirements.txt
+
+4.Apply database migrations:
+
+python manage.py migrate
+
+
+Usage
+1. Start the Django development server:
+python manage.py runserver
+
+
+2. Open your web browser and navigate to http://127.0.0.1:8000/ to access the API endpoints.
+
+/vendors/: List and create vendors.
+/vendors/{id}/: Retrieve, update, or delete a specific vendor.
+/purchase_orders/: List and create purchase orders.
+/purchase_orders/{id}/: Retrieve, update, or delete a specific purchase order.
+/vendors/performance/{vendor_id}/: Retrieve performance metrics for a specific vendor.
+
+Testing
+To run the test suite, use the following command:
+
+python manage.py test
